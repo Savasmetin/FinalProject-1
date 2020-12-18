@@ -1,4 +1,5 @@
 ﻿using Business.Abstract;
+using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.Dtos;
@@ -17,39 +18,46 @@ namespace Business.Concrete
             _productDal = productDal;
         }
 
-        public void Add(Product product)
+        public IResult Add(Product product)
         {
+            if (product.ProductName.Length<2)
+            {
+                return new ErrorResult("Ürün ismi minimum 2 karakter olmalıdır.");
+            }
             _productDal.Add(product);
+            return new SuccessResult("Ürün eklendi.");
         }
 
-        public void Delete(Product product)
+        public IResult Delete(Product product)
         {
             _productDal.Delete(product);
+            return new SuccessResult("Ürün silindi.");
         }
 
-        public List<Product> GetAll()
+        public IDataResult<List<Product>> GetAll()
         {
-            return _productDal.GetList();
+            return new SuccessDataResult<List<Product>>(_productDal.GetList());
         }
 
-        public List<Product> GetProductsByCategoryId(int categoryId)
+        public IDataResult<List<Product>> GetProductsByCategoryId(int categoryId)
         {
-            return _productDal.GetList(p=>p.CategoryId==categoryId);
+            return new SuccessDataResult<List<Product>>(_productDal.GetList(p=>p.CategoryId==categoryId));
         }
 
-        public List<ProductWithCategoryDto> GetProductsByCategoryName(string categoryName)
+        public IDataResult<List<ProductWithCategoryDto>> GetProductsByCategoryName(string categoryName)
         {
-            return _productDal.GetProductsWithCategoryName(categoryName);
+            return new SuccessDataResult<List<ProductWithCategoryDto>>(_productDal.GetProductsWithCategoryName(categoryName));
         }
 
-        public List<Product> GetProductsByUnitPrice(decimal min, decimal max)
+        public IDataResult<List<Product>> GetProductsByUnitPrice(decimal min, decimal max)
         {
-            return _productDal.GetList(p => p.UnitPrice >=min && p.UnitPrice<=max);
+            return new SuccessDataResult<List<Product>>(_productDal.GetList(p => p.UnitPrice >=min && p.UnitPrice<=max));
         }
 
-        public void Update(Product product)
+        public IResult Update(Product product)
         {
-            return _productDal.Update(product,);
+            _productDal.Update(product);
+            return new SuccessResult("Ürün güncellendi.");
         }
     }
 }
